@@ -1,0 +1,18 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'io.github.ksuzukigh.rokidwifion'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'io.github.ksuzukigh.rokidwifion'
+        minSdk 26
+        // Android 10以降でもWifiManagerによるオン操作を試せる互換対象。
+        // GitHub配布のRV101専用アプリとして使用する。
+        targetSdk 28
+        versionCode 1
+        versionName '0.1'
+    }
+}
