@@ -1,28 +1,28 @@
-# Wi-Fi ON for Rokid Glasses
+# Wi-Fi ON
 
-<p align="center"><img src="docs/images/wifi-on-overview.png" width="760" alt="Rokid GlassesでWi-Fi ONを開き、登録済みWi-Fiへ再接続する流れ"></p>
+<p align="center"><img src="docs/images/wifi-on-overview.png" width="760" alt="Rokid AI Glasses RV101でWi-Fi ONを開き、登録済みWi-Fiへ再接続する流れ"></p>
 
-Rokid Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。
+Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。
 
 **現在のバージョン: 0.3**（同梱の`Wi-Fi-ON.apk`）
 
 アプリ一覧から「Wi-Fi ON」を開くだけで、Wi-Fiを自動的にオンにし、以前使ったWi-Fiへ再接続します。普段の復旧ではMacも開発用5ピンケーブルも必要ありません。
 
-最新版では、Rokidを再起動したあとでも、Wi-Fi復旧後にMac操作ツールへ接続できるようにします。
+最新版では、Rokidを再起動したあとでも、Wi-Fi復旧後に「Rokid Control」へ接続できるようにします。
 
 ## できること
 
 1. Rokidで「Wi-Fi ON」を開く
 2. アプリがWi-Fiを自動的にオンにする
 3. 登録済みのWi-Fiへ自動的に再接続する
-4. Mac操作用の暗号化されたWi-Fi接続を復旧する
+4. 「Rokid Control」用の暗号化されたWi-Fi接続を復旧する
 
 黒い画面に「Wi-Fiはオンです」「Wi-Fiに接続しました」と表示されれば完了です。
 接続先は、Rokidに登録済みのWi-Fiのうち、その場で使えるものが自動的に選ばれます。
 
 ## 用意するもの
 
-- **Rokid Glasses RV101**
+- **Rokid AI Glasses RV101**
 - **Mac**
 - **Rokidの開発用5ピンケーブル**
   充電用ケーブルとは別の開発用ケーブルです。入手方法はRokidの販売元またはサポートへ確認してください。
@@ -46,7 +46,7 @@ GitHub画面上部の緑色の「Code」ボタンを押し、「Download ZIP」�
 3. `Rokidへアプリを入れる.command`をダブルクリックします。
 4. RokidにUSB接続の確認が出た場合は許可します。
 5. 「接続されている機器」に`Rokid RG-glasses`と表示されたことを確認し、`y`を入力してEnterを押します。
-6. アプリのインストールと、Mac操作用の接続復旧設定が自動で行われます。
+6. アプリのインストールと、「Rokid Control」用の接続復旧設定が自動で行われます。
 7. 「インストールが完了しました」と表示されたら準備完了です。
 
 ### macOSに止められた場合
@@ -69,7 +69,7 @@ GitHub画面上部の緑色の「Code」ボタンを押し、「Download ZIP」�
 2. 「Wi-Fi ON」を選んで起動します。
 3. 「Wi-Fiはオンです」と表示されるまで少し待ちます。
 4. 「Wi-Fiに接続しました」と表示されたら、右テンプルを1回タップするとアプリが閉じます。
-5. Macから操作する場合は、そのあとMac操作ツールを開きます。
+5. Macから操作する場合は、そのあと「Rokid Control」を開きます。
 
 アプリを閉じたあともWi-Fiはオンのままです。このアプリが裏で動き続けることはありません。
 
@@ -83,14 +83,14 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 
 ## このアプリが求める権限
 
-アプリ本体が使う権限は次の4つです。Wi-FiとMac操作用接続を復旧するためにだけ使用します。
+アプリ本体が使う権限は次の4つです。Wi-Fiと「Rokid Control」用接続を復旧するためにだけ使用します。
 
 | 権限 | 何に使うか |
 | --- | --- |
 | Wi-Fiの状態を見る | Wi-Fiがオンかどうかの確認 |
 | Wi-Fiの状態を変える | Wi-Fiをオンにする |
 | ネットワークの状態を見る | Wi-Fiへの接続が完了したかどうかの確認 |
-| システム設定を変更する | 初回セットアップ時にADBで許可し、暗号化されたMac操作用接続だけを復旧 |
+| システム設定を変更する | 初回セットアップ時にADBで許可し、暗号化された「Rokid Control」用接続だけを復旧 |
 
 カメラ、マイク、位置情報、写真、連絡先にはアクセスしません。
 **インターネットへ接続する権限を持っていないため、このアプリが外部へデータを送ることは技術的にできません。**
@@ -120,23 +120,23 @@ Rokidの設定 → アプリ →「Wi-Fi ON」→ アンインストールで削
 - 以前接続したことがあるWi-Fiへ再接続するアプリです。
 - 初めて使うWi-Fiでは、Rokidの設定画面でネットワーク名とパスワードを登録してください。
 - Rokidが省電力動作や写真・動画の同期後にWi-Fiを切った場合は、もう一度「Wi-Fi ON」を開いてください。
-- Mac操作用の接続復旧には、最新版の`Rokidへアプリを入れる.command`で一度セットアップしておく必要があります。
-- Rokid Glasses RV101の実機で確認しています。他の機種での動作は未確認です。
+- 「Rokid Control」用の接続復旧には、最新版の`Rokidへアプリを入れる.command`で一度セットアップしておく必要があります。
+- Rokid AI Glasses RV101の実機で確認しています。他の機種での動作は未確認です。
 
-## 関連ツール
+## 関連アプリ
 
-- [Photo to Mac](https://github.com/ksuzukigh/rokid-photo-to-mac)：Rokidで撮った写真をMacへ直接送信
-- [Rokid Glasses Mac Control](https://github.com/ksuzukigh/rokid-mac-control)：Rokidの画面をMacに表示し、マウスとキーボードで操作
+- [Photo to Mac](https://github.com/ksuzukigh/rokid-photo-to-mac)：Rokid AI Glasses RV101で撮影した写真をMacへ送ります。
+- [Rokid Control](https://github.com/ksuzukigh/rokid-mac-control)：Rokid AI Glasses RV101の画面をMacに表示し、Macから操作します。
 
 ## 実機確認
 
-Mac操作ツールのWi-Fi監視を停止した状態で、次を確認しています。
+「Rokid Control」のWi-Fi監視を停止した状態で、次を確認しています。
 
 - Rokidの正式な設定画面からWi-Fiをオフ
 - 「Wi-Fi ON」の起動だけでWi-Fiがオンへ復旧
 - 登録済みWi-Fiへ自動再接続
-- Rokid再起動後に「Wi-Fi ON」を開き、暗号化されたMac操作用接続が自動復旧
-- Mac操作ツールが新しい接続先を自動検出し、Rokid画面を再表示
+- Rokid再起動後に「Wi-Fi ON」を開き、暗号化された「Rokid Control」用接続が自動復旧
+- 「Rokid Control」が新しい接続先を自動検出し、Rokid画面を再表示
 - Wi-Fi接続後にテンプルを1回押すと、設定画面を開かずアプリだけ終了
 - アプリ一覧へ戻って30秒以上待っても、Wi-Fi設定が勝手に開かない
 - アプリを完全終了した30秒後も接続を維持
