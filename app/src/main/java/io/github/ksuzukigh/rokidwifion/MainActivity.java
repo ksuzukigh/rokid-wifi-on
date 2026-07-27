@@ -1,14 +1,17 @@
 package io.github.ksuzukigh.rokidwifion;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,16 +27,23 @@ import android.widget.Toast;
  */
 public final class MainActivity extends Activity {
     private static final String TAG = "RokidWifiOn";
+    private static final String ROKID_SETTINGS_ACTION =
+            "com.rokid.os.master.assist.server.cmd";
+    private static final String ROKID_ASSIST_SERVER_PACKAGE =
+            "com.rokid.os.sprite.assistserver";
+    private static final String ROKID_WIFI_ENABLED_SETTING =
+            "[{\"key\":\"settings_wifi_enable\",\"value\":\"true\"}]";
     private static final long AUTO_TIMEOUT_MS = 8000;
     private static final long STABILITY_CHECK_MS = 30000;
     private static final long POLL_MS = 500;
 
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView status;
     private TextView detail;
     private WifiManager wifi;
     private boolean attempting;
     private boolean waitingForSettings;
+    private boolean wirelessDebuggingRequested;
     private long automaticStartedAt;
     private long enabledAt;
 
@@ -60,6 +70,13 @@ public final class MainActivity extends Activity {
         }
     }
 
+    @Override protected void onPause() {
+        // 画面を離れたら予約済みの確認を止める。戻ったときはonResumeからやり直す。
+        handler.removeCallbacksAndMessages(null);
+        attempting = false;
+        super.onPause();
+    }
+
     @Override protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
@@ -73,7 +90,7 @@ public final class MainActivity extends Activity {
         panel.setBackgroundColor(Color.BLACK);
         panel.setClickable(true);
         panel.setFocusable(true);
-        panel.setOnClickListener(v -> openWifiSettings());
+        panel.setOnClickListener(v -> onUserTap());
 
         TextView title = new TextView(this);
         title.setText("Wi-Fi ON");
@@ -102,6 +119,8 @@ public final class MainActivity extends Activity {
     }
 
     private void startAutomaticEnable() {
+        persistRokidWifiEnabled();
+
         if (isWifiEnabled()) {
             showEnabled();
             watchStability();
@@ -130,6 +149,25 @@ public final class MainActivity extends Activity {
         handler.postDelayed(this::pollAutomaticEnable, POLL_MS);
     }
 
+    /**
+     * RV101はAndroid標準のWi-Fi状態とは別に、Rokid独自の設定値も保持している。
+     * これをオンにしないと、再起動時にSpriteWifiServiceがWi-Fiをオフへ戻す。
+     */
+    private void persistRokidWifiEnabled() {
+        try {
+            Intent intent = new Intent(ROKID_SETTINGS_ACTION);
+            intent.setPackage(ROKID_ASSIST_SERVER_PACKAGE);
+            intent.putExtra("cmd_type", "setting_change");
+            intent.putExtra("value", ROKID_WIFI_ENABLED_SETTING);
+            sendBroadcast(intent);
+            Log.i(TAG, "Rokid Wi-Fi preference enable requested");
+        } catch (RuntimeException error) {
+            // 将来のファームウェアでRokid独自経路が変わっても、
+            // Android標準の自動オンと設定画面への予備経路は継続する。
+            Log.w(TAG, "Could not update Rokid Wi-Fi preference", error);
+        }
+    }
+
     private void pollAutomaticEnable() {
         if (isWifiEnabled()) {
             attempting = false;
@@ -156,7 +194,8 @@ public final class MainActivity extends Activity {
         }
 
         if (isWifiConnected()) {
-            detail.setText("自宅Wi-Fiに接続しました");
+            enableWirelessDebuggingIfPermitted();
+            detail.setText("Wi-Fiに接続しました\nタップで閉じます");
         } else {
             detail.setText("Wi-Fi接続を待っています…");
         }
@@ -165,9 +204,35 @@ public final class MainActivity extends Activity {
         if (System.currentTimeMillis() - enabledAt < STABILITY_CHECK_MS) {
             handler.postDelayed(this::watchStability, POLL_MS);
         } else if (isWifiConnected()) {
-            detail.setText("接続は安定しています");
+            detail.setText("接続は安定しています\nタップで閉じます");
         } else {
             detail.setText("Wi-Fiはオンです。接続先を確認するにはタップ");
+        }
+    }
+
+    /**
+     * 初回セットアップで権限が付与されている場合だけ、Android標準の
+     * 暗号化されたワイヤレスデバッグを有効化する。これによりRV101の
+     * 再起動後も、Wi-Fi復旧後にMac操作ツールが再接続できる。
+     */
+    private void enableWirelessDebuggingIfPermitted() {
+        if (wirelessDebuggingRequested
+                || checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        try {
+            boolean updated = Settings.Global.putInt(
+                    getContentResolver(), "adb_wifi_enabled", 1);
+            if (updated) {
+                wirelessDebuggingRequested = true;
+                Log.i(TAG, "Secure wireless debugging enable requested");
+            }
+        } catch (SecurityException error) {
+            Log.w(TAG, "Wireless debugging permission was not granted", error);
+        } catch (RuntimeException error) {
+            Log.w(TAG, "Could not enable secure wireless debugging", error);
         }
     }
 
@@ -189,7 +254,7 @@ public final class MainActivity extends Activity {
         status.setText("Wi-Fiはオンです");
         status.setTextColor(Color.rgb(120, 255, 155));
         detail.setText(isWifiConnected()
-                ? "自宅Wi-Fiに接続しました"
+                ? "Wi-Fiに接続しました\nタップで閉じます"
                 : "Wi-Fi接続を待っています…");
     }
 
@@ -197,6 +262,14 @@ public final class MainActivity extends Activity {
         status.setText("Wi-Fiはまだオフです");
         status.setTextColor(Color.WHITE);
         detail.setText("テンプルを1回押して設定を開きます");
+    }
+
+    private void onUserTap() {
+        if (isWifiEnabled() && isWifiConnected()) {
+            finish();
+            return;
+        }
+        openWifiSettings();
     }
 
     private void openWifiSettings() {
@@ -219,7 +292,7 @@ public final class MainActivity extends Activity {
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
-            openWifiSettings();
+            onUserTap();
             return true;
         }
         return super.onKeyDown(keyCode, event);
