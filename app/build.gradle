@@ -2,6 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
+def releaseKeystorePath = System.getenv('ROKID_RELEASE_KEYSTORE') ?:
+        System.getProperty('user.home') + '/keys/rokid-wifi-on-release.jks'
+def releaseStorePassword = System.getenv('ROKID_STORE_PASSWORD')
+def releaseKeyPassword = System.getenv('ROKID_KEY_PASSWORD')
+
 android {
     namespace 'io.github.ksuzukigh.rokidwifion'
     compileSdk 35
@@ -12,7 +17,32 @@ android {
         // Android 10以降でもWifiManagerによるオン操作を試せる互換対象。
         // GitHub配布のRV101専用アプリとして使用する。
         targetSdk 28
-        versionCode 1
-        versionName '0.1'
+        versionCode 2
+        versionName '0.2'
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(releaseKeystorePath)
+            storePassword releaseStorePassword
+            keyAlias 'rokid'
+            keyPassword releaseKeyPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lint {
+        // This RV101-only app is sideloaded and intentionally targets the legacy
+        // WifiManager compatibility behavior; it is not distributed via Google Play.
+        disable 'ExpiredTargetSdkVersion'
+        // The installer grants this development permission explicitly over ADB.
+        // It is verified on the RV101 before the app is used.
+        disable 'ProtectedPermissions'
     }
 }

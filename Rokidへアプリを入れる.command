@@ -59,6 +59,10 @@ fi
 echo "Wi-Fi ONをRokidへ入れています..."
 adb -s "$SERIAL" install -r "$APK"
 
+echo "Rokid再起動後もMac操作へ戻れるように設定しています..."
+adb -s "$SERIAL" shell pm grant io.github.ksuzukigh.rokidwifion \
+    android.permission.WRITE_SECURE_SETTINGS
+
 echo
 echo "インストールが完了しました。"
 echo "Rokidのアプリ一覧から『Wi-Fi ON』を開いてください。"
