@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,7 +37,7 @@ public final class MainActivity extends Activity {
     private static final long STABILITY_CHECK_MS = 30000;
     private static final long POLL_MS = 500;
 
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView status;
     private TextView detail;
     private WifiManager wifi;
@@ -69,6 +70,13 @@ public final class MainActivity extends Activity {
         }
     }
 
+    @Override protected void onPause() {
+        // 画面を離れたら予約済みの確認を止める。戻ったときはonResumeからやり直す。
+        handler.removeCallbacksAndMessages(null);
+        attempting = false;
+        super.onPause();
+    }
+
     @Override protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
@@ -82,7 +90,7 @@ public final class MainActivity extends Activity {
         panel.setBackgroundColor(Color.BLACK);
         panel.setClickable(true);
         panel.setFocusable(true);
-        panel.setOnClickListener(v -> openWifiSettings());
+        panel.setOnClickListener(v -> onUserTap());
 
         TextView title = new TextView(this);
         title.setText("Wi-Fi ON");
@@ -187,7 +195,7 @@ public final class MainActivity extends Activity {
 
         if (isWifiConnected()) {
             enableWirelessDebuggingIfPermitted();
-            detail.setText("自宅Wi-Fiに接続しました");
+            detail.setText("Wi-Fiに接続しました\nタップで閉じます");
         } else {
             detail.setText("Wi-Fi接続を待っています…");
         }
@@ -196,7 +204,7 @@ public final class MainActivity extends Activity {
         if (System.currentTimeMillis() - enabledAt < STABILITY_CHECK_MS) {
             handler.postDelayed(this::watchStability, POLL_MS);
         } else if (isWifiConnected()) {
-            detail.setText("接続は安定しています");
+            detail.setText("接続は安定しています\nタップで閉じます");
         } else {
             detail.setText("Wi-Fiはオンです。接続先を確認するにはタップ");
         }
@@ -246,7 +254,7 @@ public final class MainActivity extends Activity {
         status.setText("Wi-Fiはオンです");
         status.setTextColor(Color.rgb(120, 255, 155));
         detail.setText(isWifiConnected()
-                ? "自宅Wi-Fiに接続しました"
+                ? "Wi-Fiに接続しました\nタップで閉じます"
                 : "Wi-Fi接続を待っています…");
     }
 
@@ -254,6 +262,14 @@ public final class MainActivity extends Activity {
         status.setText("Wi-Fiはまだオフです");
         status.setTextColor(Color.WHITE);
         detail.setText("テンプルを1回押して設定を開きます");
+    }
+
+    private void onUserTap() {
+        if (isWifiEnabled() && isWifiConnected()) {
+            finish();
+            return;
+        }
+        openWifiSettings();
     }
 
     private void openWifiSettings() {
@@ -276,7 +292,7 @@ public final class MainActivity extends Activity {
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
-            openWifiSettings();
+            onUserTap();
             return true;
         }
         return super.onKeyDown(keyCode, event);
