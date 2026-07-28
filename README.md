@@ -98,8 +98,16 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 
 ## 削除するには
 
-1. Rokidの設定 → アプリ →「Wi-Fi ON」→ アンインストールで削除します。
-2. **Rokidを一度再起動してください。** これでMac操作用の接続もオフになります。
+1. スマートフォンでRokidアプリを開きます。
+2. 「ホーム」→「ツールボックス」→「メガネのアプリ管理」の順に開きます。
+3. 「Wi-Fi ON」の右側にある丸い「－」ボタンを押し、画面の案内に従って削除します。
+4. **Rokidを一度再起動してください。** これでMac操作用の接続もオフになります。
+
+<img src="docs/images/uninstall-1-home.jpg" alt="Rokidアプリのホーム画面" width="280">
+<img src="docs/images/uninstall-2-toolbox.jpg" alt="ツールボックス画面" width="280">
+<img src="docs/images/uninstall-3-app-list.jpg" alt="メガネのアプリ管理画面" width="280">
+
+※ Rokidアプリの更新で、画面や名前が少し変わることがあります。
 
 削除しても、Wi-Fiの設定や登録済みネットワークには影響しません。
 
