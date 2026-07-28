@@ -17,8 +17,8 @@ android {
         // Android 10以降でもWifiManagerによるオン操作を試せる互換対象。
         // GitHub配布のRV101専用アプリとして使用する。
         targetSdk 28
-        versionCode 3
-        versionName '0.3'
+        versionCode 4
+        versionName '0.4'
     }
 
     signingConfigs {

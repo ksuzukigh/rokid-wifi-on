@@ -44,6 +44,8 @@ public final class MainActivity extends Activity {
     private boolean attempting;
     private boolean waitingForSettings;
     private boolean wirelessDebuggingRequested;
+    private boolean wirelessDebuggingActionAttempted;
+    private boolean wirelessDebuggingActionSucceeded;
     private long automaticStartedAt;
     private long enabledAt;
 
@@ -74,7 +76,17 @@ public final class MainActivity extends Activity {
         // 画面を離れたら予約済みの確認を止める。戻ったときはonResumeからやり直す。
         handler.removeCallbacksAndMessages(null);
         attempting = false;
+        // 開き直したときは接続待ちとMac操作用接続を最初から確認する。
+        enabledAt = 0;
+        wirelessDebuggingRequested = false;
         super.onPause();
+    }
+
+    @Override protected void onStop() {
+        // 画面を閉じて次に開くときは、明示操作をもう一度求める。
+        wirelessDebuggingActionAttempted = false;
+        wirelessDebuggingActionSucceeded = false;
+        super.onStop();
     }
 
     @Override protected void onDestroy() {
@@ -194,8 +206,7 @@ public final class MainActivity extends Activity {
         }
 
         if (isWifiConnected()) {
-            enableWirelessDebuggingIfPermitted();
-            detail.setText("Wi-Fiに接続しました\nタップで閉じます");
+            showConnectedActions();
         } else {
             detail.setText("Wi-Fi接続を待っています…");
         }
@@ -204,7 +215,7 @@ public final class MainActivity extends Activity {
         if (System.currentTimeMillis() - enabledAt < STABILITY_CHECK_MS) {
             handler.postDelayed(this::watchStability, POLL_MS);
         } else if (isWifiConnected()) {
-            detail.setText("接続は安定しています\nタップで閉じます");
+            showConnectedActions();
         } else {
             detail.setText("Wi-Fiはオンです。接続先を確認するにはタップ");
         }
@@ -215,11 +226,11 @@ public final class MainActivity extends Activity {
      * 暗号化されたワイヤレスデバッグを有効化する。これによりRV101の
      * 再起動後も、Wi-Fi復旧後にMac操作ツールが再接続できる。
      */
-    private void enableWirelessDebuggingIfPermitted() {
-        if (wirelessDebuggingRequested
-                || checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
+    private boolean enableWirelessDebuggingIfPermitted() {
+        if (wirelessDebuggingRequested) return true;
+        if (checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
                 != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return false;
         }
 
         try {
@@ -228,12 +239,19 @@ public final class MainActivity extends Activity {
             if (updated) {
                 wirelessDebuggingRequested = true;
                 Log.i(TAG, "Secure wireless debugging enable requested");
+                Toast.makeText(
+                        this,
+                        "Mac操作用の接続をオンにしました",
+                        Toast.LENGTH_LONG
+                ).show();
+                return true;
             }
         } catch (SecurityException error) {
             Log.w(TAG, "Wireless debugging permission was not granted", error);
         } catch (RuntimeException error) {
             Log.w(TAG, "Could not enable secure wireless debugging", error);
         }
+        return false;
     }
 
     private boolean isWifiEnabled() {
@@ -254,8 +272,22 @@ public final class MainActivity extends Activity {
         status.setText("Wi-Fiはオンです");
         status.setTextColor(Color.rgb(120, 255, 155));
         detail.setText(isWifiConnected()
-                ? "Wi-Fiに接続しました\nタップで閉じます"
+                ? connectedActionMessage()
                 : "Wi-Fi接続を待っています…");
+    }
+
+    private void showConnectedActions() {
+        detail.setText(connectedActionMessage());
+    }
+
+    private String connectedActionMessage() {
+        if (wirelessDebuggingActionSucceeded) {
+            return "Mac操作用の接続はオンです\nもう一度タップで閉じます";
+        }
+        if (wirelessDebuggingActionAttempted) {
+            return "Mac操作用の接続をオンにできませんでした\nもう一度タップで閉じます";
+        }
+        return "Wi-Fiに接続しました\nMacから操作するときだけタップ";
     }
 
     private void showManualNeeded() {
@@ -266,6 +298,16 @@ public final class MainActivity extends Activity {
 
     private void onUserTap() {
         if (isWifiEnabled() && isWifiConnected()) {
+            if (!wirelessDebuggingActionAttempted) {
+                wirelessDebuggingActionAttempted = true;
+                wirelessDebuggingActionSucceeded =
+                        enableWirelessDebuggingIfPermitted();
+                if (wirelessDebuggingActionSucceeded) {
+                    status.setText("Mac操作用の接続はオンです");
+                }
+                showConnectedActions();
+                return;
+            }
             finish();
             return;
         }
