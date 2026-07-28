@@ -92,7 +92,7 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 - このアプリが使うのは、Wi-Fiの確認・復旧と、Rokid Control用の接続だけです。
 - カメラ、マイク、位置情報、写真、連絡先にはアクセスしません。
 - 初回準備で許可したMacだけが、Wi-Fi経由でRokidへ接続できます。
-- 登録していないパソコンからは接続できないことを実機で確認しています。
+- 登録していないパソコンからは接続できません。
 
 自宅など、信頼できるWi-Fiでお使いください。
 
@@ -117,30 +117,12 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 - 初めて使うWi-Fiでは、Rokidの設定画面でネットワーク名とパスワードを登録してください。
 - Rokidが省電力動作や写真・動画の同期後にWi-Fiを切った場合は、もう一度「Wi-Fi ON」を開いてください。
 - 「Rokid Control」用の接続復旧には、最新版の`Rokidへアプリを入れる.command`で一度セットアップしておく必要があります。
-- Rokid AI Glasses RV101の実機で確認しています。他の機種での動作は未確認です。
+- Rokid AI Glasses RV101用です。
 
 ## 関連アプリ
 
 - [Photo to Mac](https://github.com/ksuzukigh/rokid-photo-to-mac)：Rokid AI Glasses RV101で撮影した写真をMacへ送ります。
 - [Rokid Control](https://github.com/ksuzukigh/rokid-mac-control)：Rokid AI Glasses RV101の画面をMacに表示し、Macから操作します。
-
-<details>
-<summary>テスト済みの内容</summary>
-
-「Rokid Control」のWi-Fi監視を停止した状態で、次を確認しています。
-
-- Rokidの正式な設定画面からWi-Fiをオフ
-- 「Wi-Fi ON」の起動だけでWi-Fiがオンへ復旧
-- 登録済みWi-Fiへ自動再接続
-- Rokid再起動後に「Wi-Fi ON」を開くだけで「Rokid Control」用接続が自動復旧
-- 「Rokid Control」が新しい接続先を自動検出し、Rokid画面を再表示
-- Wi-Fi接続後にテンプルを1回押すとアプリだけ終了
-- 登録済み鍵を持たない独立したADB環境からの接続をTLS認証で拒否
-- アプリ一覧へ戻って30秒以上待っても、Wi-Fi設定が勝手に開かない
-- アプリを完全終了した30秒後も接続を維持
-- 自動操作に失敗した場合は正式なWi-Fi設定を開く予備経路を搭載
-
-</details>
 
 <details>
 <summary>開発者向けの詳しい情報</summary>
@@ -153,7 +135,7 @@ RV101はAndroid 12です。このアプリは最初にRokid独自の`settings_wi
 
 初回のUSB接続で許可したMacの公開鍵がRokidへ登録されます。Wi-Fi接続では、その鍵を持つMacだけがTLSで暗号化された接続を確立できます。詳しい仕組みは[Android公式のADB Wi-Fi設計](https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/docs/dev/adb_wifi.md)で確認できます。
 
-登録済みの鍵を持たない独立したADB環境からRV101へ接続し、TLS認証で拒否されることを実機確認しています。
+登録済みの鍵を持たないADB環境からの接続は、TLS認証で拒否されます。
 
 自動操作が拒否された場合、または8秒以内にオンにならなかった場合は、`Settings.ACTION_WIFI_SETTINGS`で正式な設定画面を開きます。
 
