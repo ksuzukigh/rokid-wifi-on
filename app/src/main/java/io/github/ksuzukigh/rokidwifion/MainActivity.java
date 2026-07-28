@@ -44,8 +44,6 @@ public final class MainActivity extends Activity {
     private boolean attempting;
     private boolean waitingForSettings;
     private boolean wirelessDebuggingRequested;
-    private boolean wirelessDebuggingActionAttempted;
-    private boolean wirelessDebuggingActionSucceeded;
     private long automaticStartedAt;
     private long enabledAt;
 
@@ -80,13 +78,6 @@ public final class MainActivity extends Activity {
         enabledAt = 0;
         wirelessDebuggingRequested = false;
         super.onPause();
-    }
-
-    @Override protected void onStop() {
-        // 画面を閉じて次に開くときは、明示操作をもう一度求める。
-        wirelessDebuggingActionAttempted = false;
-        wirelessDebuggingActionSucceeded = false;
-        super.onStop();
     }
 
     @Override protected void onDestroy() {
@@ -206,7 +197,7 @@ public final class MainActivity extends Activity {
         }
 
         if (isWifiConnected()) {
-            showConnectedActions();
+            showConnected();
         } else {
             detail.setText("Wi-Fi接続を待っています…");
         }
@@ -215,7 +206,7 @@ public final class MainActivity extends Activity {
         if (System.currentTimeMillis() - enabledAt < STABILITY_CHECK_MS) {
             handler.postDelayed(this::watchStability, POLL_MS);
         } else if (isWifiConnected()) {
-            showConnectedActions();
+            showConnected();
         } else {
             detail.setText("Wi-Fiはオンです。接続先を確認するにはタップ");
         }
@@ -234,6 +225,12 @@ public final class MainActivity extends Activity {
         }
 
         try {
+            if (Settings.Global.getInt(
+                    getContentResolver(), "adb_wifi_enabled", 0) == 1) {
+                wirelessDebuggingRequested = true;
+                Log.i(TAG, "Secure wireless debugging is already enabled");
+                return true;
+            }
             boolean updated = Settings.Global.putInt(
                     getContentResolver(), "adb_wifi_enabled", 1);
             if (updated) {
@@ -271,23 +268,18 @@ public final class MainActivity extends Activity {
         attempting = false;
         status.setText("Wi-Fiはオンです");
         status.setTextColor(Color.rgb(120, 255, 155));
-        detail.setText(isWifiConnected()
-                ? connectedActionMessage()
-                : "Wi-Fi接続を待っています…");
+        if (isWifiConnected()) {
+            showConnected();
+        } else {
+            detail.setText("Wi-Fi接続を待っています…");
+        }
     }
 
-    private void showConnectedActions() {
-        detail.setText(connectedActionMessage());
-    }
-
-    private String connectedActionMessage() {
-        if (wirelessDebuggingActionSucceeded) {
-            return "Mac操作用の接続はオンです\nもう一度タップで閉じます";
-        }
-        if (wirelessDebuggingActionAttempted) {
-            return "Mac操作用の接続をオンにできませんでした\nもう一度タップで閉じます";
-        }
-        return "Wi-Fiに接続しました\nMacから操作するときだけタップ";
+    private void showConnected() {
+        boolean macConnectionReady = enableWirelessDebuggingIfPermitted();
+        detail.setText(macConnectionReady
+                ? "Wi-Fiに接続しました\nMac操作用の接続も復旧しました\nタップで閉じます"
+                : "Wi-Fiに接続しました\nMac操作用の接続には初回設定が必要です\nタップで閉じます");
     }
 
     private void showManualNeeded() {
@@ -298,16 +290,6 @@ public final class MainActivity extends Activity {
 
     private void onUserTap() {
         if (isWifiEnabled() && isWifiConnected()) {
-            if (!wirelessDebuggingActionAttempted) {
-                wirelessDebuggingActionAttempted = true;
-                wirelessDebuggingActionSucceeded =
-                        enableWirelessDebuggingIfPermitted();
-                if (wirelessDebuggingActionSucceeded) {
-                    status.setText("Mac操作用の接続はオンです");
-                }
-                showConnectedActions();
-                return;
-            }
             finish();
             return;
         }
