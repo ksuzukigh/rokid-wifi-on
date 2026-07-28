@@ -96,23 +96,6 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 
 自宅など、信頼できるWi-Fiでお使いください。
 
-<details>
-<summary>配布ファイルが正しいか確認する方法</summary>
-
-`Wi-Fi-ON.apk`が配布されたものと同一か確認したい場合は、Terminalでこのフォルダへ移動し、次を実行してください。
-
-```bash
-shasum -a 256 Wi-Fi-ON.apk
-```
-
-正しいSHA-256（v0.5）:
-
-```text
-2991653325c4dcbeb7bc0ab6f995c8db2057fe8424b43bd272e3f1b055b214de  Wi-Fi-ON.apk
-```
-
-</details>
-
 ## 削除するには
 
 1. Rokidの設定 → アプリ →「Wi-Fi ON」→ アンインストールで削除します。
