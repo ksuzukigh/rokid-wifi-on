@@ -14,10 +14,12 @@ pause_and_exit() {
 }
 
 find_rokid_serial() {
-    local serial model manufacturer
+    local serial model manufacturer fallback="" count=0
 
     while IFS= read -r serial; do
         [ -z "$serial" ] && continue
+        fallback="$serial"
+        count=$((count + 1))
         model="$(adb -s "$serial" shell getprop ro.product.model </dev/null 2>/dev/null | tr -d '\r' || true)"
         manufacturer="$(adb -s "$serial" shell getprop ro.product.manufacturer </dev/null 2>/dev/null | tr -d '\r' || true)"
         if [ "$model" = "RG-glasses" ] && [ "$manufacturer" = "Rokid" ]; then
@@ -30,6 +32,12 @@ find_rokid_serial() {
             sort -k1,1 -k2,2 |
             awk '{ print $2 }'
     )
+
+    # 型番表記が変わった場合も、接続機器が1台だけなら確認画面へ進める。
+    if [ "$count" -eq 1 ]; then
+        printf "%s" "$fallback"
+        return 0
+    fi
 
     return 1
 }
@@ -98,15 +106,40 @@ fi
 MODEL="$(adb -s "$SERIAL" shell getprop ro.product.model </dev/null 2>/dev/null | tr -d '\r' || true)"
 MANUFACTURER="$(adb -s "$SERIAL" shell getprop ro.product.manufacturer </dev/null 2>/dev/null | tr -d '\r' || true)"
 if [ "$MODEL" != "RG-glasses" ] || [ "$MANUFACTURER" != "Rokid" ]; then
-    echo "接続機器をRokid AI Glasses RV101として確認できませんでした。"
-    echo "ほかのAndroid機器を外し、Rokidをつなぎ直してからもう一度お試しください。"
-    pause_and_exit 1
+    echo
+    echo "接続機器をRokid AI Glasses RV101として自動で確認できませんでした。"
+    echo
+    echo "  Macから見えている機器: $MANUFACTURER $MODEL"
+    echo "  想定している機器:       Rokid RG-glasses"
+    echo
+    echo "この機器がRokid AI Glasses本体でない場合は、ここで中止してください。"
+    echo "（Rokid以外のAndroid端末がMacにつながっていると、この表示になります）"
+    echo
+    printf "上に表示された機器がRokid本体で間違いない場合だけ、y を入力してEnter: "
+    FORCE=""
+    read -r FORCE || true
+    case "$FORCE" in
+        y|Y|yes|YES) ;;
+        *)
+            echo "中止しました。ほかのAndroid機器を外し、Rokidをつなぎ直してからお試しください。"
+            pause_and_exit 1
+            ;;
+    esac
 fi
 
 echo
 echo "接続されている機器: $MANUFACTURER $MODEL"
 echo
-printf "このRokidに「Wi-Fi ON」を入れます。よろしければ y を入力してEnter: "
+echo "このRokidに対して、次の2つを行います。"
+echo
+echo " 1. アプリ「Wi-Fi ON」をインストールします。"
+echo " 2. 「Wi-Fi ON」に、システム設定を変更できる権限を与えます。"
+echo "    （Rokidを再起動したあとでも、Wi-Fi復旧後にMacから操作できるようにするためです。"
+echo "     この権限で変更するのは、Macとの接続に使う設定1つだけです。）"
+echo
+echo "2が不要な場合は、あとでRokidの設定からWi-Fi ONを削除してください。"
+echo
+printf "よろしければ y を入力してEnter: "
 ANSWER=""
 read -r ANSWER || true
 case "$ANSWER" in
