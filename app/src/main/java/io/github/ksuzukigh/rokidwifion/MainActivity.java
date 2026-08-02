@@ -74,7 +74,7 @@ public final class MainActivity extends Activity {
         // 画面を離れたら予約済みの確認を止める。戻ったときはonResumeからやり直す。
         handler.removeCallbacksAndMessages(null);
         attempting = false;
-        // 開き直したときは接続待ちとMac操作用接続を最初から確認する。
+        // 開き直したときは接続待ちとワイヤレスADB接続を最初から確認する。
         enabledAt = 0;
         wirelessDebuggingRequested = false;
         super.onPause();
@@ -215,7 +215,7 @@ public final class MainActivity extends Activity {
     /**
      * 初回セットアップで権限が付与されている場合だけ、Android標準の
      * 暗号化されたワイヤレスデバッグを有効化する。これによりRV101の
-     * 再起動後も、Wi-Fi復旧後にMac操作ツールが再接続できる。
+     * 再起動後も、Wi-Fi復旧後にワイヤレスADB接続を使うツールが再接続できる。
      */
     private boolean enableWirelessDebuggingIfPermitted() {
         if (wirelessDebuggingRequested) return true;
@@ -238,7 +238,7 @@ public final class MainActivity extends Activity {
                 Log.i(TAG, "Secure wireless debugging enable requested");
                 Toast.makeText(
                         this,
-                        "Mac操作用の接続をオンにしました",
+                        "ワイヤレスADB接続をオンにしました",
                         Toast.LENGTH_LONG
                 ).show();
                 return true;
@@ -276,10 +276,10 @@ public final class MainActivity extends Activity {
     }
 
     private void showConnected() {
-        boolean macConnectionReady = enableWirelessDebuggingIfPermitted();
-        detail.setText(macConnectionReady
-                ? "Wi-Fiに接続しました\nMac操作用の接続も復旧しました\nタップで閉じます"
-                : "Wi-Fiに接続しました\nMac操作用の接続には初回設定が必要です\nタップで閉じます");
+        boolean wirelessAdbReady = enableWirelessDebuggingIfPermitted();
+        detail.setText(wirelessAdbReady
+                ? "Wi-Fiに接続しました\nワイヤレスADB接続も復旧しました\nタップで閉じます"
+                : "Wi-Fiに接続しました\nワイヤレスADB接続には初回設定が必要です\nタップで閉じます");
     }
 
     private void showManualNeeded() {
