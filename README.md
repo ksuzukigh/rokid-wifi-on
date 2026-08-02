@@ -2,22 +2,25 @@
 
 <p align="center"><img src="docs/images/wifi-on-overview.png" width="760" alt="Rokid AI Glasses RV101でWi-Fi ONを開き、登録済みWi-Fiへ再接続する流れ"></p>
 
-Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。
+Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。Rokidの省電力機能などが働くため、別に公開中の「Rokid Control」のようなアプリとのWi-Fi接続が頻繁に切れてしまうことがわかったのでこのアプリを用意しました。
+
+Wi-Fi接続が切れたときにこのアプリがない場合、開発用5ピンケーブルで接続して復旧する必要がありましたが、このアプリがあればそのような面倒はなくなります。
 
 **現在のバージョン: 0.6**（同梱の`Wi-Fi-ON.apk`）
 
-アプリ一覧から「Wi-Fi ON」を開くだけで、Wi-Fiを自動的にオンにし、以前使ったWi-Fiへ再接続します。普段の復旧ではパソコンも開発用5ピンケーブルも必要ありません。
+アプリ一覧から「Wi-Fi ON」を開くだけで、Wi-Fiを自動的にオンにし、以前使ったWi-Fiへ再接続します。
 
-最新版では、Rokidを再起動したあとでも、Wi-Fi復旧後に「Rokid Control」用の接続も自動で復旧します。
+さらに、本アプリでは、「Rokid Control」のようなADB（Androidとの接続のためのプログラム）に対応したアプリでのワイヤレス接続（以下「ワイヤレスADB接続」といいます。）にも対応しており、本アプリを起動した際に併せて接続を復旧する機能があります。
+
 
 ## できること
 
-1. Rokidで「Wi-Fi ON」を開く
-2. アプリがWi-Fiを自動的にオンにする
-3. 登録済みのWi-Fiへ自動的に再接続する
-4. 登録済みMacから「Rokid Control」で接続できる状態を自動で復旧する
+Rokidで本アプリ「Wi-Fi ON」を開くと
+1．Rokid本体のWi-FiをONにする
+2. ワイヤレスADB接続を復旧する
+を実行します。
 
-黒い画面に「Wi-Fiはオンです」「Wi-Fiに接続しました」と表示されれば完了です。
+Rokidの画面に「Wi-Fiに接続しました」「ワイヤレスADB接続も復旧しました」と表示されれば完了です。
 接続先は、Rokidに登録済みのWi-Fiのうち、その場で使えるものが自動的に選ばれます。
 
 ## 用意するもの
@@ -27,7 +30,7 @@ Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧す�
 - **Rokidの開発用5ピンケーブル**
   充電用ケーブルとは別の開発用ケーブルです。入手方法はRokidの販売元またはサポートへ確認してください。
 - Macの場合は**Homebrew**（Mac用のソフト導入ツール）
-  入っていない場合は、初回準備の途中で案内が表示されます。Windowsの場合は、インストーラーが[Google公式のAndroid Platform-Tools](https://developer.android.com/tools/releases/platform-tools)を自動で準備します。インストーラー自体にAndroid Studioや管理者権限は必要ありません。
+  入っていない場合は、初回準備の途中で案内が表示されます。
 - **Rokidのスマホアプリ側で開発者モード（ADB）を有効にしておくこと**
   開発用5ピンケーブルをつなぐだけではADBは有効になりません。スマホアプリでRV101を接続し、開発者モード（ADB）を有効にしてから進めてください。
 
@@ -45,22 +48,18 @@ Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧す�
 2. Rokidを開発用5ピンケーブルでWindows PCへつなぎます。
 3. `install-wifi-on.cmd`をダブルクリックします。
 4. 初回だけ、インストーラーがGoogle公式のAndroid Platform-Toolsを自動でダウンロードします。
-5. RokidにUSB接続の確認が出た場合は許可します。
-6. 接続された機器と実行内容を確認し、`y`を入力してEnterを押します。
-7. 「Installation completed successfully.」と表示されたら準備完了です。
+5. 接続された機器と実行内容を確認し、`y`を入力してEnterを押します。
+6. 「Installation completed successfully.」と表示されたら準備完了です。
 
-WindowsでRokidが見つからない場合は、RokidのADB開発者モードが有効か、開発用5ピンケーブルを使っているか、USB接続の確認を許可したかを確認してください。それでも表示されない場合は、デバイスマネージャーでRokidのADB用USBドライバーが認識されているか確認してください。ドライバーの入手方法はRokidの販売元またはサポートへ確認してください。
+WindowsでRokidが見つからない場合は、RokidのADB開発者モードが有効か、開発用5ピンケーブルを使っているかを確認してください。
 
 <details>
 <summary>Windowsに止められた場合</summary>
 
 「WindowsによってPCが保護されました」と表示された場合は、次のように許可します。
 
-1. ZIPファイルを、必ずこのREADMEにあるGitHub Releasesのリンクからダウンロードしたことを確認します。
-2. 警告画面の「詳細情報」を押します。
-3. 表示されたファイル名が`install-wifi-on.cmd`であることを確認し、「実行」を押します。
-
-`install-wifi-on.ps1`を直接開かず、必ず同梱の`install-wifi-on.cmd`を使ってください。会社や学校のPCなどで「実行」ボタンが表示されない場合は、管理者のセキュリティ設定で実行が禁止されています。
+1. 警告画面の「詳細情報」を押します。
+2. 表示されたファイル名が`install-wifi-on.cmd`であることを確認し、「実行」を押します。
 
 詳しくは[MicrosoftのSmartScreenに関する説明](https://learn.microsoft.com/ja-jp/windows/apps/package-and-deploy/smartscreen-reputation)を参照してください。
 
@@ -71,10 +70,9 @@ WindowsでRokidが見つからない場合は、RokidのADB開発者モードが
 1. Rokid以外のAndroid端末（スマホなど）がMacにつながっていたら、いったん外します。
 2. Rokidを開発用5ピンケーブルでMacへつなぎます。
 3. `Rokidへアプリを入れる.command`をダブルクリックします。
-4. RokidにUSB接続の確認が出た場合は許可します。
-5. 「接続されている機器」に`Rokid RG-glasses`と表示されたこと、および行われる2つの内容を確認し、`y`を入力してEnterを押します。
-6. アプリのインストールと、「Rokid Control」用の接続復旧設定が自動で行われます。
-7. 「インストールが完了しました」と表示されたら準備完了です。
+4. 「接続されている機器」に`Rokid RG-glasses`と表示されたこと、および行われる2つの内容を確認し、`y`を入力してEnterを押します。
+5. アプリのインストールと、「Rokid Control」用の接続復旧設定が自動で行われます。
+6. 「インストールが完了しました」と表示されたら準備完了です。
 
 <details>
 <summary>Macに止められた場合</summary>
@@ -98,21 +96,41 @@ WindowsでRokidが見つからない場合は、RokidのADB開発者モードが
 1. Rokidのアプリ一覧を開きます。
 2. 「Wi-Fi ON」を選んで起動します。
 3. 「Wi-Fiはオンです」と表示されるまで少し待ちます。
-4. 「Wi-Fiに接続しました」「Mac操作用の接続も復旧しました」と表示されたら、右テンプルを1回タップしてアプリを閉じます。
-5. Macから操作する場合は、そのあと「Rokid Control」を開きます。
+4. 「Wi-Fiに接続しました」「ワイヤレスADB接続も復旧しました」と表示されたら、右テンプルを1回タップしてアプリを閉じます。
+5. パソコンから操作する場合は、そのあと使用するRokid用アプリ「例：Rokid Control」を開きます。
 
 アプリを閉じたあともWi-Fiはオンのままです。このアプリが裏で動き続けることはありません。
 
 <details>
 <summary>自動でオンにならなかった場合</summary>
 
-AndroidやRokidの更新などで自動操作が許可されなかった場合は、アプリが正式なWi-Fi設定画面を開きます。
+AndroidやRokidの更新などで自動操作が許可されなかった場合は、アプリがAndroid標準仕様のWi-Fi設定画面を開きます。
 
-RV101では、この画面はWi-Fiの行が選ばれた状態で開きます。右テンプルを1回タップしてください。これは「Photo to Mac」がWi-Fi設定を開いたときと同じ操作です。
+RV101では、この画面はWi-Fiの行が選ばれた状態で開きます。右テンプルを1回タップしてください。別に配布している「Photo to Mac」と同じ動作をします。
 
-Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行まで移動してからタップしてください。
 
 </details>
+
+## ADBについて
+
+### ADBとは
+
+ADB（Android Debug Bridge）は、パソコンからAndroid端末へ命令を送るための標準的な仕組みです。
+
+Wi-Fi ONが使うのは、Android標準の暗号化されたワイヤレスADBです。アプリが独自の通信サービスをインターネット上に開くわけではありません。
+
+### 初回セットアップで行うこと
+
+初回だけ、開発用5ピンケーブルでRokidとパソコンをつなぎ、次の設定を行います。
+
+1. パソコンのADB公開鍵をRokidへ登録します。
+2. Wi-Fi ONアプリをRokidへインストールします。
+3. Wi-Fi ONアプリに、Androidの保護された設定を変更するための権限を付与します。
+4. Wi-Fi ONを起動したとき、Wi-Fiの復旧に続けて暗号化されたワイヤレスADBをオンにします。
+
+この権限を付与するのは、通常のAndroidアプリからはワイヤレスADBをオンにできないためです。Wi-Fi ONがこの権限で変更するのは、ワイヤレスADBを有効にするためのAndroid標準設定だけです。
+
+初回セットアップが済んだパソコンは、USBケーブルを外したあとも、同じWi-Fi上で登録済みのADB鍵を使ってRokidへ接続できます。別のパソコンは、初回セットアップを行わない限り接続できません。
 
 ## 安全性について
 
@@ -121,16 +139,23 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 - カメラ、マイク、位置情報、写真、連絡先にはアクセスしません。
 - 初回準備で許可したMacまたはWindows PCだけが、Wi-Fi経由でRokidへ接続できます。
 - 登録していないパソコンからは接続できません。
-- Wi-FiへつながるとMac操作用の接続も自動でオンになります。自宅か外出先かは判別しません。
+- Wi-FiへつながるとワイヤレスADB接続も自動でオンになります。自宅か外出先かは判別しません。
 
-自宅など、信頼できるWi-Fiでお使いください。Mac操作用の接続をオフにするにはRokidを再起動してください。オフのまま使う場合は「Wi-Fi ON」を開かず、Rokidの通常のWi-Fi設定から接続します。
+自宅など、信頼できるWi-Fiでお使いください。ワイヤレスADB接続をオフにするにはRokidを再起動してください。オフのまま使う場合は「Wi-Fi ON」を開かず、Rokidの通常のWi-Fi設定から接続します。
+
+## 困ったとき
+
+- 「ワイヤレスADB接続には初回設定が必要です」と表示される場合は、インストーラーを最後まで実行できていません。もう一度初回セットアップを行ってください。
+- WindowsでRokidが見つからない場合は、開発者モード（ADB）が有効か、開発用5ピンケーブルを使っているかを確認してください。
+- Wi-Fiが自動でオンにならず設定画面が開いた場合は、画面のWi-Fiの行を選び、右テンプルを1回タップしてください。
+- Wi-Fi ONを削除した場合は、Rokidを一度再起動してください。これでワイヤレスADB接続もオフになります。
 
 ## 削除するには
 
 1. スマートフォンでRokidアプリを開きます。
 2. 「ホーム」→「ツールボックス」→「メガネのアプリ管理」の順に開きます。
 3. 「Wi-Fi ON」の右側にある丸い「－」ボタンを押し、画面の案内に従って削除します。
-4. **Rokidを一度再起動してください。** これでMac操作用の接続もオフになります。
+4. **Rokidを一度再起動してください。** これでワイヤレスADB接続もオフになります。
 
 <img src="docs/images/uninstall-1-home.jpg" alt="Rokidアプリのホーム画面" width="280">
 <img src="docs/images/uninstall-2-toolbox.jpg" alt="ツールボックス画面" width="280">
@@ -145,7 +170,7 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 - 以前接続したことがあるWi-Fiへ再接続するアプリです。
 - 初めて使うWi-Fiでは、Rokidの設定画面でネットワーク名とパスワードを登録してください。
 - Rokidが省電力動作や写真・動画の同期後にWi-Fiを切った場合は、もう一度「Wi-Fi ON」を開いてください。
-- 「Rokid Control」用の接続復旧には、最新版の`install-wifi-on.cmd`または`Rokidへアプリを入れる.command`で一度セットアップしておく必要があります。
+- ワイヤレスADB接続の復旧には、最新版の`install-wifi-on.cmd`または`Rokidへアプリを入れる.command`で一度セットアップしておく必要があります。
 - Rokid AI Glasses RV101用です。
 
 ## 関連アプリ
@@ -158,36 +183,9 @@ Rokid本体の更新で画面の作りが変わった場合は、Wi-Fiの行ま�
 
 ### 仕組み
 
-RV101はAndroid 12です。このアプリは最初にRokid独自の`settings_wifi_enable`を正式な端末内ブロードキャストでオンへ更新し、続けてAndroidに残されている旧来アプリ向けの互換動作を利用して`WifiManager.setWifiEnabled(true)`を試します。
+Wi-Fi ONは、起動時にWi-Fiを復旧し、続けてワイヤレスADB接続を復旧します。常時Wi-Fiを監視したり、裏で動き続けたりするアプリではありません。
 
-セットアップ時には`WRITE_SECURE_SETTINGS`権限を付与します。このアプリが同権限で変更するのは、Wi-Fi接続後のAndroid標準`adb_wifi_enabled`だけです。これにより、再起動でワイヤレスデバッグがオフになっても、Rokid Control用のTLS接続を復旧できます。
-
-初回のUSB接続で許可したPCの公開鍵がRokidへ登録されます。Wi-Fi接続では、その鍵を持つMacまたはWindows PCだけがTLSで暗号化された接続を確立できます。詳しい仕組みは[Android公式のADB Wi-Fi設計](https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/docs/dev/adb_wifi.md)で確認できます。
-
-登録済みの鍵を持たないADB環境からの接続は、TLS認証で拒否されます。
-
-自動操作が拒否された場合、または8秒以内にオンにならなかった場合は、`Settings.ACTION_WIFI_SETTINGS`で正式な設定画面を開きます。
-
-アプリはWi-Fiを常時監視するサービスではありません。起動時の復旧だけを行います。
-
-初回セットアップ後、MacまたはWindowsでは`adb`の接続用プロセスが動いたままになる場合があります。終了するにはMacのTerminalで`adb kill-server`、WindowsのPowerShellで`adb.exe kill-server`を実行します。ただし、ほかのRokid用ツールを使用中は終了しないでください。WindowsのADBは`%LOCALAPPDATA%\Rokid-Wi-Fi-ON\platform-tools\adb.exe`にあります。
-
-初回準備でMacへ入れた`adb`が不要になった場合は、Terminalで`brew uninstall android-platform-tools`を実行すると削除できます。ただし、ほかのRokid用ツールで使用している場合は削除しないでください。
-
-### Androidアプリを自分で作り直す場合
-
-JDK 17、Android SDKが必要です。
-
-```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
-export ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools
-export ROKID_STORE_PASSWORD='配布用キーストアのパスワード'
-export ROKID_KEY_PASSWORD="$ROKID_STORE_PASSWORD"
-./gradlew assembleRelease
-```
-
-同梱の`Wi-Fi-ON.apk`は`app/build/outputs/apk/release/app-release.apk`を複製したものです。
-配布用の`~/keys/rokid-wifi-on-release.jks`とパスワードはリポジトリへ追加せず、安全な場所へバックアップしてください。どちらかを失うと、同じ署名の更新版を配布できなくなります。
+自動でWi-Fiをオンにできない場合は、RokidのWi-Fi設定画面を開きます。
 
 </details>
 

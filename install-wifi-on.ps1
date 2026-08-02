@@ -175,27 +175,17 @@ try {
     Write-Host 'Waiting up to 60 seconds for an authorized ADB device...' -ForegroundColor Cyan
 
     $rokidDevice = $null
-    $unauthorizedMessageShown = $false
     for ($attempt = 0; $attempt -lt 60 -and $null -eq $rokidDevice; $attempt++) {
         $rokidDevice = Find-RokidDevice
         if ($null -ne $rokidDevice) {
             break
         }
 
-        if (-not $unauthorizedMessageShown) {
-            $unauthorizedDevices = @(Get-AdbDevices | Where-Object { $_.State -eq 'unauthorized' })
-            if ($unauthorizedDevices.Count -gt 0) {
-                Write-Host
-                Write-Host 'Approve the USB debugging prompt on Rokid, then wait here.' -ForegroundColor Yellow
-                $unauthorizedMessageShown = $true
-            }
-        }
-
         Start-Sleep -Seconds 1
     }
 
     if ($null -eq $rokidDevice) {
-        throw 'Rokid was not detected. Confirm ADB mode, the development cable, the USB debugging prompt, and the Windows USB driver.'
+        throw 'Rokid was not detected. Confirm ADB mode and the development cable.'
     }
 
     Write-Host
