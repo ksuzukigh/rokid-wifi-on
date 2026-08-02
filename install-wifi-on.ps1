@@ -16,30 +16,52 @@ function Stop-Installer {
     exit $ExitCode
 }
 
+function Invoke-AdbCapture {
+    param([Parameter(Mandatory = $true)][string[]]$Arguments)
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        # adb writes harmless server-start messages to stderr on its first run.
+        # Capture both streams without turning those messages into terminating errors.
+        $ErrorActionPreference = 'Continue'
+        $output = @(& $adbPath @Arguments 2>&1)
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+
+    return [pscustomobject]@{
+        ExitCode = $exitCode
+        Output = @($output | ForEach-Object { $_.ToString() })
+    }
+}
+
 function Invoke-Adb {
     param([Parameter(Mandatory = $true)][string[]]$Arguments)
 
-    $output = @(& $adbPath @Arguments 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        $message = ($output -join [Environment]::NewLine).Trim()
+    $result = Invoke-AdbCapture -Arguments $Arguments
+    if ($result.ExitCode -ne 0) {
+        $message = ($result.Output -join [Environment]::NewLine).Trim()
         if ([string]::IsNullOrWhiteSpace($message)) {
-            $message = "adb exited with code $LASTEXITCODE."
+            $message = "adb exited with code $($result.ExitCode)."
         }
         throw $message
     }
 
-    return $output
+    return $result.Output
 }
 
 function Get-AdbDevices {
-    $output = @(& $adbPath devices 2>$null)
-    if ($LASTEXITCODE -ne 0) {
+    $result = Invoke-AdbCapture -Arguments @('devices')
+    if ($result.ExitCode -ne 0) {
         return @()
     }
 
     $devices = @()
-    foreach ($line in $output) {
-        if ($line -match '^\s*(?<serial>\S+)\s+(?<state>\S+)\s*$') {
+    foreach ($line in $result.Output) {
+        # Ignore adb daemon messages and parse only actual device rows.
+        if ($line -match '^\s*(?<serial>\S+)\s+(?<state>device|unauthorized|offline)(?:\s+.*)?$') {
             $devices += [pscustomobject]@{
                 Serial = $Matches.serial
                 State = $Matches.state
@@ -56,12 +78,12 @@ function Get-DeviceProperty {
         [Parameter(Mandatory = $true)][string]$PropertyName
     )
 
-    $output = @(& $adbPath -s $Serial shell getprop $PropertyName 2>$null)
-    if ($LASTEXITCODE -ne 0) {
+    $result = Invoke-AdbCapture -Arguments @('-s', $Serial, 'shell', 'getprop', $PropertyName)
+    if ($result.ExitCode -ne 0) {
         return ''
     }
 
-    return ($output -join "`n").Trim()
+    return ($result.Output -join "`n").Trim()
 }
 
 function Find-RokidDevice {
