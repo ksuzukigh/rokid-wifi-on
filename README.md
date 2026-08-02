@@ -2,7 +2,7 @@
 
 <p align="center"><img src="docs/images/wifi-on-overview.png" width="760" alt="Rokid AI Glasses RV101でWi-Fi ONを開き、登録済みWi-Fiへ再接続する流れ"></p>
 
-Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。Rokidの省電力機能などが働くため、別に公開中の「Rokid Control」のようなアプリとのWi-Fi接続が頻繁に切れてしまうことがわかったのでこのアプリを用意しました。
+Rokid AI Glasses RV101のWi-Fiが切れたとき、メガネ単体で復旧するための小さなアプリです。Wi-Fiが切れると、Rokid ControlなどのパソコンからRokidを操作するアプリも使えなくなります。
 
 Wi-Fi接続が切れたときにこのアプリがない場合、開発用5ピンケーブルで接続して復旧する必要がありましたが、このアプリがあればそのような面倒はなくなります。
 
@@ -10,17 +10,12 @@ Wi-Fi接続が切れたときにこのアプリがない場合、開発用5ピ�
 
 アプリ一覧から「Wi-Fi ON」を開くだけで、Wi-Fiを自動的にオンにし、以前使ったWi-Fiへ再接続します。
 
-さらに、本アプリでは、「Rokid Control」のようなADB（Androidとの接続のためのプログラム）に対応したアプリでのワイヤレス接続（以下「ワイヤレスADB接続」といいます。）にも対応しており、本アプリを起動した際に併せて接続を復旧する機能があります。
-
-
 ## できること
 
-Rokidで本アプリ「Wi-Fi ON」を開くと
+Rokidで本アプリ「Wi-Fi ON」を開くと、次の2つを実行します。
 
-1. Rokid本体のWi-FiをONにする
+1. Rokid本体のWi-Fiをオンにする
 2. ワイヤレスADB接続を復旧する
-
-を実行します。
 
 Rokidの画面に「Wi-Fiに接続しました」「ワイヤレスADB接続も復旧しました」と表示されれば完了です。
 接続先は、Rokidに登録済みのWi-Fiのうち、その場で使えるものが自動的に選ばれます。
@@ -36,7 +31,7 @@ Rokidの画面に「Wi-Fiに接続しました」「ワイヤレスADB接続も�
 - **Rokidのスマホアプリ側で開発者モード（ADB）を有効にしておくこと**
   開発用5ピンケーブルをつなぐだけではADBは有効になりません。スマホアプリでRV101を接続し、開発者モード（ADB）を有効にしてから進めてください。
 
-初回のみ、接続に必要なADBを自動で準備します。WindowsではGoogle公式のAndroid Platform-Toolsを`%LOCALAPPDATA%\Rokid-Wi-Fi-ON\platform-tools`へ保存します。ダウンロードに数分かかる場合があります。画面が止まったように見えても、そのままお待ちください。
+初回のみ、接続に必要なADBを準備します。WindowsではGoogle公式のAndroid Platform-Toolsを`%LOCALAPPDATA%\Rokid-Wi-Fi-ON\platform-tools`へ自動で保存します。MacではHomebrewを使って準備します。ダウンロードに数分かかる場合があります。画面が止まったように見えても、そのままお待ちください。
 
 ## 最初の準備
 
@@ -106,11 +101,9 @@ WindowsでRokidが見つからない場合は、RokidのADB開発者モードが
 <details>
 <summary>自動でオンにならなかった場合</summary>
 
-AndroidやRokidの更新などで自動操作が許可されなかった場合は、アプリがAndroid標準仕様のWi-Fi設定画面を開きます。
+AndroidやRokidの更新などで自動操作が許可されなかった場合は、アプリがAndroid標準のWi-Fi設定画面を開きます。
 
 RV101では、この画面はWi-Fiの行が選ばれた状態で開きます。右テンプルを1回タップしてください。別に配布している「Photo to Mac」と同じ動作をします。
-
-
 </details>
 
 ## ADBについて
@@ -136,7 +129,7 @@ Wi-Fi ONが使うのは、Android標準の暗号化されたワイヤレスADB�
 
 ## 安全性について
 
-- このアプリが使うのは、Wi-Fiの確認・復旧と、Rokid Control用の接続だけです。
+- このアプリが行うのは、Wi-Fiの確認・復旧と、ワイヤレスADB接続の有効化だけです。
 - アプリ自身はインターネットへ接続する権限を持っておらず、データを外部へ送ることはできません。
 - カメラ、マイク、位置情報、写真、連絡先にはアクセスしません。
 - 初回準備で許可したMacまたはWindows PCだけが、Wi-Fi経由でRokidへ接続できます。
